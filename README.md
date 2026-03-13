@@ -1,5 +1,7 @@
 # `@arkjxu/agentskills`
 
+[![CI](https://github.com/arkjxu/agentskills/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/arkjxu/agentskills/actions/workflows/ci.yml)
+
 Minimal TypeScript primitives for working with local agent skills.
 
 Implements the Agent Skills format described at https://agentskills.io/specification.
