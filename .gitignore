@@ -1,0 +1,16 @@
+node_modules
+
+build
+
+coverage
+
+# dotenv environment variable files
+.env
+.env.*
+
+.claude
+
+*.tsbuildinfo
+
+# Finder (MacOS) folder config
+.DS_Store

@@ -1,0 +1,29 @@
+{
+  "name": "@arkjxu/agentskills",
+  "version": "1.0.0",
+  "type": "module",
+  "types": "./build/main.d.mts",
+  "scripts": {
+    "example": "bun run examples/basic.ts",
+    "build": "tsdown"
+  },
+  "exports": {
+    ".": {
+      "import": "./build/main.mjs",
+      "types": "./build/main.d.mts"
+    }
+  },
+  "files": ["build", "README.md", "LICENSE"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/archiver": "^7.0.0",
+    "@types/bun": "latest",
+    "tsdown": "^0.21.2",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3"
+  }
+}
