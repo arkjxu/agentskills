@@ -1,9 +1,6 @@
 [test]
 coverage = true
 coverageSkipTestFiles = true
-# Only enforce line coverage threshold - function coverage is misleading
-# for utility classes with static methods (abstract classes still have
-# implicit constructors that count as uncovered functions)
 coverageThreshold = { line = 0.8 }
 coverageDir = "coverage"
 coverageReporter = ["text", "lcov"]
