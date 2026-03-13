@@ -1,106 +1,96 @@
+# CLAUDE.md
 
-Default to using Bun instead of Node.js.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Overview
+
+This is `@arkjxu/agentskills`, a TypeScript library for discovering, validating, and loading Agent Skills following the specification at https://agentskills.io/specification.
+
+Skills are local directories containing a `SKILL.md` file with YAML frontmatter and markdown instructions. The library provides primitives for:
+- Discovering skills across multiple directories
+- Validating frontmatter (name, description, license, compatibility, allowed-tools, metadata)
+- Loading skill content, references, assets, and scripts with path-traversal protection
+
+## Commands
+
+### Development
+```bash
+bun install           # Install dependencies
+bun test              # Run all tests
+bun run build         # Build package to build/ directory
+bun run example       # Run examples/basic.ts against built package
+```
+
+### Testing
+- Tests live in `src/*.spec.ts` alongside implementation files
+- Uses Bun's built-in test runner (`bun:test`)
+- Run specific test: `bun test src/skill.spec.ts`
+
+## Architecture
+
+### Core Classes
+
+**SkillRegistry** (`src/registry.ts`)
+- Takes an array of discovery directories in constructor
+- `discovery()` - scans directories for valid skills, returns `AvailableSkill[]` with status "loaded" or "error"
+- `getSkill(location)` - loads a specific skill by path (with security validation)
+
+**Skill** (`src/skill.ts`)
+- Represents a single skill with validated frontmatter
+- Static loaders: `Skill.load(filename)` and `Skill.loadFromDirectory(dir)`
+- Resource methods: `loadContent()`, `loadReference(name)`, `loadAsset(name)`, `getScriptPath(name)`
+- Frontmatter parsing uses streaming to locate `---` delimiters without loading entire file
+
+**SkillValidator** (`src/validator.ts`)
+- Validates frontmatter fields against spec constraints
+- Name: 1-64 chars, lowercase alphanumeric + hyphens, must match directory name
+- Description: 1-1024 chars
+- Compatibility: 1-500 chars (optional)
+- Allowed-tools: space/comma-delimited string or array (normalized to `string[] | null`)
+
+**SkillSecurity** (`src/security.ts`)
+- `ensureResourceIsWithinSkillContext(resourcePath, skillRootDir)` - prevents path traversal
+- All resource loading goes through this check
+
+### Build System
+
+- Uses `tsdown` (configured in `tsdown.config.ts`)
+- Entry point: `src/main.ts` (exports all public API)
+- Output: `build/main.mjs` (ESM) and `build/main.d.mts` (types)
+- Target platform: Node.js, format: ESM
+
+### Skill Directory Structure
+
+```
+my-skill/
+├── SKILL.md           # Frontmatter + instructions
+├── references/        # Additional documentation
+├── assets/            # Templates, images, data files
+└── scripts/           # Executable code
+```
+
+### Security Model
+
+All resource access is constrained to the skill root directory:
+- References must be in `references/`
+- Assets must be in `assets/`
+- Scripts must be in `scripts/`
+- `SkillSecurity.ensureResourceIsWithinSkillContext()` validates all paths before loading
+
+## Bun Usage
+
+Default to using Bun instead of Node.js:
 - Use `bun <file>` instead of `node <file>` or `ts-node <file>`
 - Use `bun test` instead of `jest` or `vitest`
-- Use `bun build <file.html|file.ts|file.css>` instead of `webpack` or `esbuild`
-- Use `bun install` instead of `npm install` or `yarn install` or `pnpm install`
-- Use `bun run <script>` instead of `npm run <script>` or `yarn run <script>` or `pnpm run <script>`
-- Use `bunx <package> <command>` instead of `npx <package> <command>`
-- Bun automatically loads .env, so don't use dotenv.
+- Use `bun install` instead of `npm install`
+- Use `bun run <script>` instead of `npm run <script>`
+- Use `bunx <package>` instead of `npx <package>`
+- Bun automatically loads .env files
 
-## APIs
+## When Making Changes
 
-- `Bun.serve()` supports WebSockets, HTTPS, and routes. Don't use `express`.
-- `bun:sqlite` for SQLite. Don't use `better-sqlite3`.
-- `Bun.redis` for Redis. Don't use `ioredis`.
-- `Bun.sql` for Postgres. Don't use `pg` or `postgres.js`.
-- `WebSocket` is built-in. Don't use `ws`.
-- Prefer `Bun.file` over `node:fs`'s readFile/writeFile
-- Bun.$`ls` instead of execa.
-
-## Testing
-
-Use `bun test` to run tests.
-
-```ts#index.test.ts
-import { test, expect } from "bun:test";
-
-test("hello world", () => {
-  expect(1).toBe(1);
-});
-```
-
-## Frontend
-
-Use HTML imports with `Bun.serve()`. Don't use `vite`. HTML imports fully support React, CSS, Tailwind.
-
-Server:
-
-```ts#index.ts
-import index from "./index.html"
-
-Bun.serve({
-  routes: {
-    "/": index,
-    "/api/users/:id": {
-      GET: (req) => {
-        return new Response(JSON.stringify({ id: req.params.id }));
-      },
-    },
-  },
-  // optional websocket support
-  websocket: {
-    open: (ws) => {
-      ws.send("Hello, world!");
-    },
-    message: (ws, message) => {
-      ws.send(message);
-    },
-    close: (ws) => {
-      // handle close
-    }
-  },
-  development: {
-    hmr: true,
-    console: true,
-  }
-})
-```
-
-HTML files can import .tsx, .jsx or .js files directly and Bun's bundler will transpile & bundle automatically. `<link>` tags can point to stylesheets and Bun's CSS bundler will bundle.
-
-```html#index.html
-<html>
-  <body>
-    <h1>Hello, world!</h1>
-    <script type="module" src="./frontend.tsx"></script>
-  </body>
-</html>
-```
-
-With the following `frontend.tsx`:
-
-```tsx#frontend.tsx
-import React from "react";
-import { createRoot } from "react-dom/client";
-
-// import .css files directly and it works
-import './index.css';
-
-const root = createRoot(document.body);
-
-export default function Frontend() {
-  return <h1>Hello, world!</h1>;
-}
-
-root.render(<Frontend />);
-```
-
-Then, run index.ts
-
-```sh
-bun --hot ./index.ts
-```
-
-For more information, read the Bun API docs in `node_modules/bun-types/docs/**.mdx`.
+- Update corresponding `*.spec.ts` test files when changing validation or loading logic
+- Keep the public API surface small - only export from `src/main.ts`
+- Maintain path-traversal protection when adding new resource-loading features
+- Ensure directory name matches frontmatter `name` field (enforced by `Skill.load()`)
+- Run `bun run build` before running examples to test against built output
