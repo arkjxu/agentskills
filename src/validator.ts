@@ -7,7 +7,7 @@ export interface ValidatedSkillFrontmatter {
   metadata?: Record<string, string> | null;
 }
 
-export class SkillValidator {
+export abstract class SkillValidator {
   static readonly MAX_NAME_LENGTH = 64;
   static readonly MAX_DESCRIPTION_LENGTH = 1024;
   static readonly MAX_COMPATIBILITY_LENGTH = 500;

@@ -1,6 +1,6 @@
 import { resolve, sep } from "node:path";
 
-export class SkillSecurity {
+export abstract class SkillSecurity {
   static ensureResourceIsWithinSkillContext(
     resourcePath: string,
     skillRootDir: string,
