@@ -12,47 +12,12 @@ const CHUNK_SIZE = 64 * 1024;
 export class Skill {
   private readonly _contentSeekAt: number;
 
-  /* Location: the directory where the skill is defined */
   public readonly location: string;
-
-  /* Name: must be 1-64 chars, may contain lowercase alphanumeric characters (a-z, 0-9) and hyphens (-)
-   * Must not start or end with a hyphen
-   * Must not contain consecutive hyphens --
-   * Must match the parent directory name
-   */
   public readonly name: string;
-
-  /* Description: must be 1-1024 characters
-   * Should describe both what the skill does and when to use it
-   * Should include specific keywords that help agents identify relevant tasks
-   */
   public readonly description: string;
-
-  /*
-   * License: Optional field, recommend keeping it short.
-   */
   public readonly license: string | null;
-
-  /*
-   * Compatibility: must be 1-500 characters if provided
-   * should only be included if your skill have specific environment requirements
-   * Can indicate intended product, required system packages, network access needs, etc.
-   */
   public readonly compatibility: string | null;
-
-  /*
-   * Metadata: optional field.
-   * A map from string keys to string values
-   * Clients can use this to store additional properties not defined by the agent skills spec
-   * recommend making your key names reasonably unique to avoid accidental conflicts
-   */
   public readonly metadata: Record<string, string> | null;
-
-  /*
-   * Allowed-Tools: optional field
-   * A space-delimited list of tools that are pre-approved to run
-   * Experimental support for this field may vary
-   */
   public readonly allowedTools: string[] | null;
 
   static readonly __REFERENCES_DIR = "references";
@@ -171,9 +136,6 @@ export class Skill {
     return Skill.load(contentFilePath);
   }
 
-  /*
-   * The Markdown body after the frontmatter contains the skill instructions. There are no format restrictions. Write whatever helps agents perform the task effectively.
-   */
   async loadContent(): Promise<Buffer> {
     const contentFilePath = join(this.location, Skill.__CONTENT_FILE);
     await using stream = createReadStream(contentFilePath, {
@@ -189,9 +151,6 @@ export class Skill {
     return Buffer.concat(chunks);
   }
 
-  /*
-   *  Contains additional documentation that agents can read when needed:
-   */
   async loadReference(referenceFileName: string): Promise<Buffer> {
     const referenceFilePath = join(
       this.location,
@@ -221,12 +180,6 @@ export class Skill {
     return Buffer.concat(chunks);
   }
 
-  /*
-   *  Contains static resources:
-   *  Templates (document templates, configuration templates)
-   *  Images (diagrams, examples)
-   *  Data files (lookup tables, schemas)
-   */
   async loadAsset(assetFileName: string): Promise<Buffer> {
     const assetFilePath = join(
       this.location,
@@ -254,13 +207,6 @@ export class Skill {
     return Buffer.concat(chunks);
   }
 
-  /*
-   * Contains executable code that agents can run. Scripts should:
-   * Be self-contained or clearly document dependencies
-   * Include helpful error messages
-   * Handle edge cases gracefully
-   * Supported languages depend on the agent implementation. Common options include Python, Bash, and JavaScript.
-   */
   async getScriptPath(scriptName: string): Promise<string> {
     const scriptPath = join(this.location, Skill.__SCRIPTS_DIR, scriptName);
 

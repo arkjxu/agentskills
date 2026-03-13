@@ -11,13 +11,4 @@ export default defineConfig([
     platform: TARGET_PLATFORM,
     format: TARGET_FORMAT,
   },
-  // {
-  //   entry: {
-  //     "main.min": "./src/main.ts",
-  //   },
-  //   outDir: OUT_DIR,
-  //   platform: TARGET_PLATFORM,
-  //   format: TARGET_FORMAT,
-  //   minify: true,
-  // },
 ]);
