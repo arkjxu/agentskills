@@ -137,4 +137,4 @@ Methods:
 
 ## Contributing
 
-Contributor-facing setup and development notes live in [docs/CONTRIBUTE.md](/Users/arkjxu/Projects/node/agentskills/docs/CONTRIBUTE.md).
+Contributor-facing setup and development notes live in [docs/CONTRIBUTE.md](/docs/CONTRIBUTE.md).
